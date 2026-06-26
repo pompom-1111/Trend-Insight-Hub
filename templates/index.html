@@ -5,52 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trend Insight Hub - 趨勢中心</title>
     <style>
-        body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 40px 20px;
-            color: #333;
+        body { font-family: 'PingFang TC', sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #1a202c; margin-bottom: 30px; }
+        
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #edf2f7; color: #4a5568; font-weight: 600; }
+        .rank { font-weight: bold; color: #3182ce; width: 80px; }
+        
+        /* 徽章樣式 */
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; color: white; display: inline-block; width: 60px; text-align: center; }
+        .badge-kkbox { background-color: #00C1D5; }
+        .badge-youtube { background-color: #FF0000; }
+        .badge-spotify { background-color: #1DB954; }
+
+        /* 按鈕樣式 */
+        .tab-container { text-align: center; margin-bottom: 20px; }
+        .tab-btn {
+            background-color: white; border: 2px solid #e2e8f0; color: #4a5568; 
+            padding: 10px 20px; margin: 0 5px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; transition: all 0.2s;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        h1 {
-            text-align: center;
-            color: #1a202c;
-            margin-bottom: 30px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            background-color: #edf2f7;
-            color: #4a5568;
-            font-weight: 600;
-        }
-        .rank {
-            font-weight: bold;
-            color: #3182ce;
-            width: 80px;
-        }
-        .song-title {
-            font-weight: 500;
-        }
-        .artist {
-            color: #718096;
-        }
+        .tab-btn:hover { background-color: #edf2f7; }
+        .tab-btn.active { background-color: #3182ce; color: white; border-color: #3182ce; }
     </style>
 </head>
 <body>
@@ -58,29 +37,64 @@
 <div class="container">
     <h1>🎵 Trend Insight Hub 流行音樂趨勢</h1>
     
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="filterPlatform('All', this)">全部顯示</button>
+        <button class="tab-btn" onclick="filterPlatform('KKBOX', this)">KKBOX</button>
+        <button class="tab-btn" onclick="filterPlatform('YouTube', this)">YouTube</button>
+        <button class="tab-btn" onclick="filterPlatform('Spotify', this)">Spotify</button>
+    </div>
+
     <table>
         <thead>
             <tr>
+                <th>平台</th>
                 <th>排名</th>
                 <th>歌曲名稱</th>
                 <th>歌手</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="chart-body">
             {% for song in songs %}
-            <tr>
+            <tr class="song-row" data-platform="{{ song.platform }}">
+                <td>
+                    {% if song.platform == 'KKBOX' %}
+                        <span class="badge badge-kkbox">KKBOX</span>
+                    {% elif song.platform == 'YouTube' %}
+                        <span class="badge badge-youtube">YouTube</span>
+                    {% elif song.platform == 'Spotify' %}
+                        <span class="badge badge-spotify">Spotify</span>
+                    {% else %}
+                        <span class="badge" style="background-color:gray;">未知</span>
+                    {% endif %}
+                </td>
                 <td class="rank">第 {{ song.rank }} 名</td>
                 <td class="song-title">{{ song.song_name }}</td>
                 <td class="artist">{{ song.artist_name }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" style="text-align: center; color: #a0aec0;">目前資料庫中沒有資料，請先執行爬蟲腳本！</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+    function filterPlatform(platform, btnElement) {
+        // 1. 改變按鈕樣式
+        let buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // 2. 篩選表格列
+        let rows = document.querySelectorAll('.song-row');
+        rows.forEach(row => {
+            let rowPlatform = row.getAttribute('data-platform');
+            if (platform === 'All' || rowPlatform === platform) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
