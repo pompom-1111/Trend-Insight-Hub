@@ -8,6 +8,7 @@
         /* === 基礎重置與排版 === */
         body { font-family: 'PingFang TC', sans-serif; background-color: #f4f6f9; margin: 0; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        a:hover { color: #55ccff !important; transition: 0.2s; } /* 連結懸停變色效果 */
 
         /* === 頂部導覽列 (Hololive 風格) === */
         .top-navbar {
@@ -33,7 +34,7 @@
         .title-Spotify { border-left: 6px solid #1DB954; color: #1DB954; }
 
         .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .modern-table th, .modern-table td { padding: 18px 15px; text-align: left; border-bottom: 1px solid #edf2f7; }
+        .modern-table th, .modern-table td { padding: 18px 15px; text-align: left; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
         .modern-table thead th { background-color: #f8fafc; color: #718096; font-size: 0.95em; letter-spacing: 1px; }
         .modern-table tbody tr:nth-child(even) { background-color: #fcfcfc; }
         .modern-table tbody tr:hover { background-color: #f0f4f8; transition: background-color 0.2s ease; }
@@ -58,8 +59,9 @@
         .list-song { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #edf2f7; color: #4a5568; transition: 0.2s; }
         .list-song:hover { transform: translateX(5px); color: #000; }
         .list-rank { font-size: 1.4em; font-weight: 900; width: 40px; }
-        .list-info { font-size: 1.1em; font-weight: 600; }
-        .list-info span { font-weight: 400; color: #718096; margin-left: 8px; }
+        /* 讓右側清單的封面圖和文字完美對齊 */
+        .list-info { font-size: 1.1em; font-weight: 600; display: flex; align-items: center; gap: 12px;}
+        .list-info span { font-weight: 400; color: #718096; }
     </style>
 </head>
 <body>
@@ -89,7 +91,13 @@
                             {% if song.platform == p %}
                             <tr>
                                 <td class="rank">第 {{ song.rank }} 名</td>
-                                <td class="modern-song-title">{{ song.song_name }}</td>
+                                <td class="modern-song-title">
+                                    <!-- 👇 這裡加入了圖片與點擊連結 -->
+                                    <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px;">
+                                        <img src="{{ song.image_url }}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
+                                        {{ song.song_name }}
+                                    </a>
+                                </td>
                                 <td class="modern-artist">{{ song.artist_name }}</td>
                             </tr>
                             {% endif %}
@@ -110,9 +118,16 @@
                         {% if song.platform == p and song.rank <= 3 %}
                         <div class="top-song">
                             <div class="rank-circle">{% if song.rank == 1 %}1ST{% elif song.rank == 2 %}2nd{% else %}3rd{% endif %}</div>
-                            <div class="top-info"><span class="top-title">{{ song.song_name }}</span><span class="top-artist">{{ song.artist_name }}</span></div>
+                            <!-- 👇 加入前三名大封面圖 -->
+                            <img src="{{ song.image_url }}" alt="cover" style="width: 60px; height: 60px; border-radius: 10px; margin-right: 15px; object-fit: cover;">
+                            <div class="top-info">
+                                <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                    <span class="top-title" style="display: block;">{{ song.song_name }}</span>
+                                </a>
+                                <span class="top-artist">{{ song.artist_name }}</span>
+                            </div>
                         </div>
-                        {% endif %}
+                        {% endif %} <!-- 剛剛就是這裡的 endif 不見了！ -->
                     {% endfor %}
                 </div>
                 <div class="right-panel">
@@ -120,7 +135,14 @@
                         {% if song.platform == p and song.rank > 3 %}
                         <div class="list-song">
                             <div class="list-rank">{{ song.rank }}</div>
-                            <div class="list-info">{{ song.song_name }} <span>- {{ song.artist_name }}</span></div>
+                            <div class="list-info">
+                                <!-- 👇 加入 4-10 名小封面圖 -->
+                                <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+                                    <img src="{{ song.image_url }}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                                    {{ song.song_name }} 
+                                </a>
+                                <span>- {{ song.artist_name }}</span>
+                            </div>
                         </div>
                         {% endif %}
                     {% endfor %}

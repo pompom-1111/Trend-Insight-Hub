@@ -2,39 +2,35 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 
-# 載入環境變數
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
 
-# 定義建立新表格的 SQL 語法
-# 我們將表名改為通用的 daily_charts，並新增 platform 欄位
-CREATE_NEW_TABLE_QUERY = """
-CREATE TABLE IF NOT EXISTS daily_charts (
+# 強制重建表格，確保欄位完整
+CREATE_TABLE_QUERY = """
+DROP TABLE IF EXISTS daily_charts;
+CREATE TABLE daily_charts (
     id SERIAL PRIMARY KEY,
-    platform VARCHAR(50) NOT NULL,   -- 新增：用來紀錄是 'KKBOX' 還是 'YouTube'
+    platform VARCHAR(50) NOT NULL,
     rank INTEGER NOT NULL,
     song_name VARCHAR(255) NOT NULL,
     artist_name VARCHAR(255) NOT NULL,
+    image_url TEXT,
+    song_url TEXT,
     scrape_date DATE DEFAULT CURRENT_DATE
 );
 """
 
-def upgrade_database():
+def init_db():
     try:
-        print("連線至雲端資料庫中...")
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
-        
-        print("正在建立通用版排行榜表格 (daily_charts)...")
-        cur.execute(CREATE_NEW_TABLE_QUERY)
-        conn.commit() 
-        
-        print("🎉 新資料表建立完成！我們現在有能力容納多個平台的資料了。")
-        
+        cur.execute(CREATE_TABLE_QUERY)
+        conn.commit()
+        print("🎉 資料表 daily_charts 重建完成 (包含 image_url 和 song_url)！")
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"發生錯誤: {e}")
+        print(f"資料庫重建失敗: {e}")
 
 if __name__ == "__main__":
-    upgrade_database()
+    init_db()
