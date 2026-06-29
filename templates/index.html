@@ -3,123 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trend Insight Hub - 趨勢中心</title>
+    <title>Trend Insight Hub - 跨平台趨勢中心</title>
     <style>
-        /* ========================================= */
-        /* === 1. 基礎重置與全域背景設定 === */
-        /* ========================================= */
+        /* =========================================
+           1. 基礎重置與全域背景設定
+           ========================================= */
         body { 
-            font-family: 'PingFang TC', sans-serif; 
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; 
             margin: 0; 
             color: #333; 
-            /* 背景圖片設定 */
+            background-color: #f4f6f9;
             background-image: url("{{ url_for('static', filename='bg.jpg') }}");
-            background-size: cover;        /* 讓圖片覆蓋整個畫面 */
-            background-position: center;   /* 圖片置中對齊 */
-            background-attachment: fixed;  /* 背景固定，滾動視窗時不跟著移動 */
+            background-size: cover;        
+            background-position: center;   
+            background-attachment: fixed;  
             background-repeat: no-repeat;
-            background-color: #f4f6f9;     /* 圖片尚未載入時的備用底色 */
         }
 
         a:hover { 
             color: #55ccff !important; 
-            transition: 0.2s; 
+            transition: color 0.2s ease-in-out; 
         } 
 
-        /* ========================================= */
-        /* === 2. 主要內容容器 (半透明底板) === */
-        /* ========================================= */
+        /* =========================================
+           2. 主要內容容器 (毛玻璃與半透明底板)
+           ========================================= */
         .container { 
             max-width: 1000px; 
             margin: 20px auto; 
             padding: 20px 30px; 
-            /* 半透明白色底板，確保文字在背景圖上依然清晰 */
             background-color: rgba(255, 255, 255, 0.85); 
             border-radius: 16px;
             min-height: 100vh;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); 
         }
 
-        /* ========================================= */
-        /* === 3. 頂部導覽列 (Navbar) === */
-        /* ========================================= */
+        /* =========================================
+           3. 頂部導覽列 (Navbar)
+           ========================================= */
         .top-navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 50px; background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 15px 50px; 
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
         }
-        .logo-area { display: flex; align-items: center; gap: 10px; font-size: 1.6em; font-weight: 900; color: #1a202c; letter-spacing: 0.5px; }
-        .nav-buttons { display: flex; gap: 15px; }
-        .tab-btn {
-            background-color: transparent; color: #1a202c; border: 2px solid transparent;
-            padding: 8px 24px; border-radius: 50px; font-weight: bold; font-size: 1em;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .tab-btn:hover { background-color: #f0f4f8; color: #55ccff; }
-        .tab-btn.active { background-color: #55ccff; color: white; box-shadow: 0 4px 12px rgba(85, 204, 255, 0.4); }
 
-        /* ========================================= */
-        /* === 4. 綜合影響力 Top 5 專區樣式 === */
-        /* ========================================= */
-        .impact-section { background: white; padding: 30px; margin-bottom: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-        .impact-title { font-size: 1.6em; font-weight: 900; margin-bottom: 5px; padding-left: 15px; border-left: 6px solid #f6ad55; color: #dd6b20; letter-spacing: 1px; }
-        .impact-desc { color: #718096; margin-bottom: 25px; padding-left: 21px; font-size: 0.95em; }
-        .impact-card { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid #edf2f7; transition: 0.2s; border-radius: 12px; }
-        .impact-card:hover { background-color: #fffaf0; transform: translateX(5px); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .impact-rank { font-size: 1.8em; font-weight: 900; color: #fbd38d; width: 50px; text-align: center; font-style: italic; }
-        .impact-info { flex: 1; display: flex; align-items: center; gap: 15px; }
-        .impact-score { font-size: 1.2em; font-weight: bold; color: #c53030; background: #fed7d7; padding: 6px 15px; border-radius: 20px; margin-left: auto; letter-spacing: 1px;}
+        .logo-area { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 1.6em; 
+            font-weight: 900; 
+            color: #1a202c; 
+            letter-spacing: 0.5px; 
+        }
+
+        .nav-buttons { 
+            display: flex; 
+            gap: 15px; 
+        }
+
+        .tab-btn {
+            background-color: transparent; 
+            color: #1a202c; 
+            border: 2px solid transparent;
+            padding: 8px 24px; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            font-size: 1em;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover { 
+            background-color: #f0f4f8; 
+            color: #55ccff; 
+        }
+
+        .tab-btn.active { 
+            background-color: #55ccff; 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(85, 204, 255, 0.4); 
+        }
+
+        /* =========================================
+           4. 綜合影響力 Top 5 專區樣式
+           ========================================= */
+        .impact-section { 
+            background: white; 
+            padding: 30px; 
+            margin-bottom: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); 
+        }
+
+        .impact-title { 
+            font-size: 1.6em; 
+            font-weight: 900; 
+            margin-bottom: 5px; 
+            padding-left: 15px; 
+            border-left: 6px solid #f6ad55; 
+            color: #dd6b20; 
+            letter-spacing: 1px; 
+        }
+
+        .impact-desc { 
+            color: #718096; 
+            margin-bottom: 25px; 
+            padding-left: 21px; 
+            font-size: 0.95em; 
+        }
+
+        .impact-card { 
+            display: flex; 
+            align-items: center; 
+            padding: 15px 20px; 
+            border-bottom: 1px solid #edf2f7; 
+            transition: transform 0.2s ease, background-color 0.2s ease; 
+            border-radius: 12px; 
+        }
+
+        .impact-card:hover { 
+            background-color: #fffaf0; 
+            transform: translateX(5px); 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); 
+        }
+
+        .impact-rank { 
+            font-size: 1.8em; 
+            font-weight: 900; 
+            color: #fbd38d; 
+            width: 50px; 
+            text-align: center; 
+            font-style: italic; 
+        }
+
+        .impact-info { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+
+        .impact-score { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            color: #c53030; 
+            background: #fed7d7; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            margin-left: auto; 
+            letter-spacing: 1px;
+        }
         
         /* 平台徽章標籤 */
-        .platform-badge { font-size: 0.75em; padding: 4px 8px; border-radius: 6px; color: white; margin-right: 5px; font-weight: bold; letter-spacing: 0.5px;}
+        .platform-badge { 
+            font-size: 0.75em; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            color: white; 
+            margin-right: 5px; 
+            font-weight: bold; 
+            letter-spacing: 0.5px;
+        }
+
         .badge-KKBOX { background-color: #00B1D2; }
         .badge-YouTube { background-color: #FF0000; }
         .badge-Spotify { background-color: #1DB954; }
 
-        /* ========================================= */
-        /* === 5. 全部顯示：現代化分組卡片與表格 === */
-        /* ========================================= */
-        .platform-group { background: white; padding: 30px; margin-bottom: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-        .platform-title { font-size: 1.6em; font-weight: 900; margin-bottom: 25px; padding-left: 15px; letter-spacing: 1px; }
+        /* =========================================
+           5. 全部顯示：現代化分組卡片與表格
+           ========================================= */
+        .platform-group { 
+            background: white; 
+            padding: 30px; 
+            margin-bottom: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); 
+        }
+
+        .platform-title { 
+            font-size: 1.6em; 
+            font-weight: 900; 
+            margin-bottom: 25px; 
+            padding-left: 15px; 
+            letter-spacing: 1px; 
+        }
+
         .title-KKBOX { border-left: 6px solid #00B1D2; color: #00B1D2; }
         .title-YouTube { border-left: 6px solid #FF0000; color: #FF0000; }
         .title-Spotify { border-left: 6px solid #1DB954; color: #1DB954; }
 
-        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .modern-table th, .modern-table td { padding: 18px 15px; text-align: left; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
-        .modern-table thead th { background-color: #f8fafc; color: #718096; font-size: 0.95em; letter-spacing: 1px; }
-        .modern-table tbody tr:nth-child(even) { background-color: #fcfcfc; }
-        .modern-table tbody tr:hover { background-color: #f0f4f8; transition: background-color 0.2s ease; }
-        .modern-song-title { font-weight: bold; color: #2d3748; font-size: 1.1em; }
-        .modern-artist { color: #718096; }
+        .modern-table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+        }
 
-        /* ========================================= */
-        /* === 6. 單一平台：戰情看板版面 === */
-        /* ========================================= */
-        .dashboard-container { display: none; margin-top: 20px; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .board-header { padding: 20px; color: white; text-align: center; border-radius: 12px 12px 0 0; font-size: 1.8em; font-weight: bold; letter-spacing: 2px; }
+        .modern-table th, .modern-table td { 
+            padding: 18px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid #edf2f7; 
+            vertical-align: middle; 
+        }
+
+        .modern-table thead th { 
+            background-color: #f8fafc; 
+            color: #718096; 
+            font-size: 0.95em; 
+            letter-spacing: 1px; 
+        }
+
+        .modern-table tbody tr:nth-child(even) { 
+            background-color: #fcfcfc; 
+        }
+
+        .modern-table tbody tr:hover { 
+            background-color: #f0f4f8; 
+            transition: background-color 0.2s ease; 
+        }
+
+        .modern-song-title { 
+            font-weight: bold; 
+            color: #2d3748; 
+            font-size: 1.1em; 
+        }
+
+        .modern-artist { 
+            color: #718096; 
+        }
+
+        /* =========================================
+           6. 單一平台：戰情看板版面
+           ========================================= */
+        .dashboard-container { 
+            display: none; 
+            margin-top: 20px; 
+            animation: fadeIn 0.4s ease; 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .board-header { 
+            padding: 20px; 
+            color: white; 
+            text-align: center; 
+            border-radius: 12px 12px 0 0; 
+            font-size: 1.8em; 
+            font-weight: bold; 
+            letter-spacing: 2px; 
+        }
+
         .bg-KKBOX { background-color: #00B1D2; }
         .bg-YouTube { background-color: #FF0000; }
         .bg-Spotify { background-color: #1DB954; }
 
-        .board-body { display: flex; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-        .left-panel { flex: 1; background-color: #1a1a1a; color: white; padding: 30px; }
-        .top-song { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .rank-circle { width: 50px; height: 50px; border: 2px solid #55ccff; color: #55ccff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; flex-shrink: 0; }
-        .top-title { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
-        .top-artist { font-size: 0.9em; color: #a0aec0; }
-        .right-panel { flex: 1.5; background-color: #ffffff; padding: 30px 40px; }
-        .list-song { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #edf2f7; color: #4a5568; transition: 0.2s; }
-        .list-song:hover { transform: translateX(5px); color: #000; }
-        .list-rank { font-size: 1.4em; font-weight: 900; width: 40px; }
-        .list-info { font-size: 1.1em; font-weight: 600; display: flex; align-items: center; gap: 12px;}
-        .list-info span { font-weight: 400; color: #718096; }
+        .board-body { 
+            display: flex; 
+            border-radius: 0 0 12px 12px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
+        }
+
+        .left-panel { 
+            flex: 1; 
+            background-color: #1a1a1a; 
+            color: white; 
+            padding: 30px; 
+        }
+
+        .top-song { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            padding-bottom: 15px; 
+        }
+
+        .rank-circle { 
+            width: 50px; 
+            height: 50px; 
+            border: 2px solid #55ccff; 
+            color: #55ccff; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-weight: bold; 
+            margin-right: 15px; 
+            flex-shrink: 0; 
+        }
+
+        .top-title { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+
+        .top-artist { 
+            font-size: 0.9em; 
+            color: #a0aec0; 
+        }
+
+        .right-panel { 
+            flex: 1.5; 
+            background-color: #ffffff; 
+            padding: 30px 40px; 
+        }
+
+        .list-song { 
+            display: flex; 
+            align-items: center; 
+            padding: 15px 0; 
+            border-bottom: 1px solid #edf2f7; 
+            color: #4a5568; 
+            transition: 0.2s; 
+        }
+
+        .list-song:hover { 
+            transform: translateX(5px); 
+            color: #000; 
+        }
+
+        .list-rank { 
+            font-size: 1.4em; 
+            font-weight: 900; 
+            width: 40px; 
+        }
+
+        .list-info { 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+        }
+
+        .list-info span { 
+            font-weight: 400; 
+            color: #718096; 
+        }
     </style>
 </head>
 <body>
 
-    <!-- 頂部導覽列 -->
+    <!-- =========================================
+         頂部導覽列模組
+         ========================================= -->
     <header class="top-navbar">
         <div class="logo-area">
             <span>🌟</span><span>Trend-Insight-Hub</span>
@@ -132,12 +370,12 @@
         </nav>
     </header>
 
-    <!-- 主要內容容器 -->
+    <!-- =========================================
+         主要內容容器
+         ========================================= -->
     <div class="container">
         
-        <!-- ========================================= -->
-        <!-- 視圖 1：全部顯示 (總榜單與各平台列表)       -->
-        <!-- ========================================= -->
+        <!-- 視圖 1：全部顯示 (總榜單與各平台原始列表) -->
         <div id="view-All">
             
             <!-- 區塊：全網綜合影響力 Top 5 -->
@@ -147,136 +385,150 @@
                 
                 <div class="impact-list">
                     {% for song in top_integrated_songs %}
-                    <div class="impact-card">
-                        <div class="impact-rank">#{{ loop.index }}</div>
-                        <div class="impact-info">
-                            <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px;">
-                                <img src="{{ song.image_url }}" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                                <div>
-                                    <div style="font-size: 1.25em; font-weight: bold; color: #2d3748;">{{ song.song_name }}</div>
-                                    <div style="color: #718096; font-size: 0.95em; margin-top: 4px; margin-bottom: 8px;">{{ song.artist_name }}</div>
+                        <div class="impact-card">
+                            <div class="impact-rank">#{{ loop.index }}</div>
+                            <div class="impact-info">
+                                <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px;">
+                                    <img src="{{ song.image_url }}" alt="Album Cover" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                                     <div>
-                                        <!-- 動態渲染平台徽章 -->
-                                        {% for p in song.platforms %}
-                                            <span class="platform-badge badge-{{ p }}">{{ p }}</span>
-                                        {% endfor %}
+                                        <div style="font-size: 1.25em; font-weight: bold; color: #2d3748;">{{ song.song_name }}</div>
+                                        <div style="color: #718096; font-size: 0.95em; margin-top: 4px; margin-bottom: 8px;">{{ song.artist_name }}</div>
+                                        <div>
+                                            <!-- 動態渲染上榜平台徽章 -->
+                                            {% for p in song.platforms %}
+                                                <span class="platform-badge badge-{{ p }}">{{ p }}</span>
+                                            {% endfor %}
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            </div>
+                            <div class="impact-score">{{ song.total_score }} pts</div>
                         </div>
-                        <div class="impact-score">{{ song.total_score }} pts</div>
-                    </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- 區塊：三大平台原始列表 -->
+            <!-- 區塊：三大平台獨立流行趨勢榜 (表格顯示) -->
             {% for p in ['KKBOX', 'YouTube', 'Spotify'] %}
-            <div class="platform-group">
-                <div class="platform-title title-{{ p }}">{{ p }} 流行趨勢榜</div>
-                <table class="modern-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 100px;">排名</th>
-                            <th>歌曲名稱</th>
-                            <th>歌手</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for song in songs %}
-                            {% if song.platform == p %}
+                <div class="platform-group">
+                    <div class="platform-title title-{{ p }}">{{ p }} 流行趨勢榜</div>
+                    <table class="modern-table">
+                        <thead>
                             <tr>
-                                <td class="rank">第 {{ song.rank }} 名</td>
-                                <td class="modern-song-title">
-                                    <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px;">
-                                        <img src="{{ song.image_url }}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
-                                        {{ song.song_name }}
-                                    </a>
-                                </td>
-                                <td class="modern-artist">{{ song.artist_name }}</td>
+                                <th style="width: 100px;">排名</th>
+                                <th>歌曲名稱</th>
+                                <th>歌手</th>
                             </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {% for song in songs %}
+                                {% if song.platform == p %}
+                                    <tr>
+                                        <td class="rank">第 {{ song.rank }} 名</td>
+                                        <td class="modern-song-title">
+                                            <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px;">
+                                                <img src="{{ song.image_url }}" alt="Cover" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
+                                                {{ song.song_name }}
+                                            </a>
+                                        </td>
+                                        <td class="modern-artist">{{ song.artist_name }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% endfor %}
         </div>
 
-        <!-- ========================================= -->
-        <!-- 視圖 2, 3, 4：單一平台獨立戰情看板          -->
-        <!-- ========================================= -->
+        <!-- 視圖 2, 3, 4：單一平台戰情看板 (動態切換顯示) -->
         {% for p in ['KKBOX', 'YouTube', 'Spotify'] %}
-        <div id="view-{{ p }}" class="dashboard-container">
-            <div class="board-header bg-{{ p }}"><span class="dynamic-date"></span> {{ p }} 音樂流行排行</div>
-            <div class="board-body">
-                
-                <!-- 左側：Top 3 強調顯示 -->
-                <div class="left-panel">
-                    {% for song in songs %}
-                        {% if song.platform == p and song.rank <= 3 %}
-                        <div class="top-song">
-                            <div class="rank-circle">{% if song.rank == 1 %}1ST{% elif song.rank == 2 %}2nd{% else %}3rd{% endif %}</div>
-                            <img src="{{ song.image_url }}" alt="cover" style="width: 60px; height: 60px; border-radius: 10px; margin-right: 15px; object-fit: cover;">
-                            <div class="top-info">
-                                <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit;">
-                                    <span class="top-title" style="display: block;">{{ song.song_name }}</span>
-                                </a>
-                                <span class="top-artist">{{ song.artist_name }}</span>
-                            </div>
-                        </div>
-                        {% endif %} 
-                    {% endfor %}
+            <div id="view-{{ p }}" class="dashboard-container">
+                <div class="board-header bg-{{ p }}">
+                    <span class="dynamic-date"></span> {{ p }} 音樂流行排行
                 </div>
+                <div class="board-body">
+                    
+                    <!-- 左側面板：Top 3 強調顯示 -->
+                    <div class="left-panel">
+                        {% for song in songs %}
+                            {% if song.platform == p and song.rank <= 3 %}
+                                <div class="top-song">
+                                    <div class="rank-circle">
+                                        {% if song.rank == 1 %}1ST
+                                        {% elif song.rank == 2 %}2nd
+                                        {% else %}3rd
+                                        {% endif %}
+                                    </div>
+                                    <img src="{{ song.image_url }}" alt="cover" style="width: 60px; height: 60px; border-radius: 10px; margin-right: 15px; object-fit: cover;">
+                                    <div class="top-info">
+                                        <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                            <span class="top-title" style="display: block;">{{ song.song_name }}</span>
+                                        </a>
+                                        <span class="top-artist">{{ song.artist_name }}</span>
+                                    </div>
+                                </div>
+                            {% endif %} 
+                        {% endfor %}
+                    </div>
 
-                <!-- 右側：第 4 - 10 名列表顯示 -->
-                <div class="right-panel">
-                    {% for song in songs %}
-                        {% if song.platform == p and song.rank > 3 %}
-                        <div class="list-song">
-                            <div class="list-rank">{{ song.rank }}</div>
-                            <div class="list-info">
-                                <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
-                                    <img src="{{ song.image_url }}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
-                                    {{ song.song_name }} 
-                                </a>
-                                <span>- {{ song.artist_name }}</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
+                    <!-- 右側面板：第 4 - 10 名列表顯示 -->
+                    <div class="right-panel">
+                        {% for song in songs %}
+                            {% if song.platform == p and song.rank > 3 %}
+                                <div class="list-song">
+                                    <div class="list-rank">{{ song.rank }}</div>
+                                    <div class="list-info">
+                                        <a href="{{ song.song_url }}" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+                                            <img src="{{ song.image_url }}" alt="cover" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                                            {{ song.song_name }} 
+                                        </a>
+                                        <span>- {{ song.artist_name }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
                 </div>
-
             </div>
-        </div>
         {% endfor %}
     </div>
 
-<!-- ========================================= -->
-<!-- 前端互動邏輯 (JavaScript)                 -->
-<!-- ========================================= -->
-<script>
-    // 取得今日日期並更新畫面
-    const today = new Date();
-    const dateString = `${today.getMonth() + 1}月${today.getDate()}日`;
-    document.querySelectorAll('.dynamic-date').forEach(el => { el.textContent = dateString; });
+    <!-- =========================================
+         前端互動邏輯 (JavaScript)
+         ========================================= -->
+    <script>
+        /**
+         * 取得今日日期並更新畫面中的標題日期
+         */
+        const today = new Date();
+        const dateString = `${today.getMonth() + 1}月${today.getDate()}日`;
+        document.querySelectorAll('.dynamic-date').forEach(el => { 
+            el.textContent = dateString; 
+        });
 
-    // 切換平台視圖的過濾功能
-    function filterPlatform(platform, btnElement) {
-        // 1. 重置所有按鈕狀態
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
+        /**
+         * 切換平台視圖的過濾功能
+         * @param {string} platform - 要顯示的平台名稱 ('All', 'KKBOX', 'YouTube', 'Spotify')
+         * @param {HTMLElement} btnElement - 被點擊的按鈕元素
+         */
+        function filterPlatform(platform, btnElement) {
+            // 1. 重置所有按鈕的活躍狀態，並為當前點擊的按鈕加入 active 樣式
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
 
-        // 2. 控制視圖顯示隱藏
-        if (platform === 'All') {
-            document.getElementById('view-All').style.display = 'block';
+            // 2. 隱藏所有 Dashboard 視圖
             document.querySelectorAll('.dashboard-container').forEach(el => el.style.display = 'none');
-        } else {
-            document.getElementById('view-All').style.display = 'none';
-            document.querySelectorAll('.dashboard-container').forEach(el => el.style.display = 'none');
-            document.getElementById('view-' + platform).style.display = 'block';
+
+            // 3. 根據選擇的平台顯示對應的內容區塊
+            if (platform === 'All') {
+                document.getElementById('view-All').style.display = 'block';
+            } else {
+                document.getElementById('view-All').style.display = 'none';
+                document.getElementById('view-' + platform).style.display = 'block';
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
