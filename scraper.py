@@ -99,31 +99,54 @@ def get_demo_youtube_data():
         ('YouTube', 10, '初戀', '宇多田光', demo_img, 'https://music.youtube.com/')
     ]        
 
-# --- 4. YouTube 爬蟲 ---
+# --- 4. YouTube 爬蟲 (搜尋強制鎖定版) ---
 def scrape_youtube():
-    print("\n[引擎啟動] 啟動解壓縮模式：正在讀取排行榜清單內容...")
+    print("\n[引擎啟動] 啟動游擊模式：繞過官方圖表 API，強制搜尋台灣官方歌單...")
     records = []
     try:
-        yt = YTMusic()
-        charts = yt.get_charts(country='TW')
-        target_playlist = charts.get('videos', [])[0]
-        playlist_id = target_playlist.get('playlistId')
+        yt = YTMusic(language='zh_TW', location='TW') 
         
-        if not playlist_id:
-            raise Exception("找不到該排行榜的 Playlist ID")
+        # 🌟 策略轉變：直接搜尋官方的台灣排行榜歌單，不依賴不穩定的 get_charts
+        print("👉 正在搜尋官方台灣熱門歌曲清單...")
+        search_results = yt.search("台灣百大熱門歌曲", filter="playlists")
+        
+        target_playlist_id = None
+        
+        # 過濾尋找 YouTube Music 官方建立的歌單或標題含有台灣的歌單
+        for playlist in search_results:
+            author = playlist.get('author', '')
+            title = playlist.get('title', '')
+            if 'YouTube' in author or '台灣' in title or 'Taiwan' in title:
+                target_playlist_id = playlist.get('browseId')
+                print(f"👉 成功鎖定目標歌單：{title} ({target_playlist_id})")
+                break
+                
+        # 如果上面沒找到完美匹配，就直接拿搜尋結果的第一個
+        if not target_playlist_id and search_results:
+            target_playlist_id = search_results[0].get('browseId')
             
-        print(f"👉 成功鎖定排行榜清單，正在解壓縮內容...")
-        playlist_data = yt.get_playlist(playlist_id)
+        if not target_playlist_id:
+            raise Exception("搜尋不到任何台灣排行榜歌單")
+            
+        print(f"👉 正在解壓縮歌單內容...")
+        playlist_data = yt.get_playlist(target_playlist_id)
         top_songs = playlist_data.get('tracks', [])
+        
+        print(f"✅ 成功提取歌曲，開始擷取...")
         
         count = 0
         for song in top_songs:
             if count >= 10: break
-            title = song.get('title', 'Unknown')
-            artists = song.get('artists', [])
-            artist_name = ", ".join([a.get('name', '') for a in artists]) if artists else "Unknown"
             
-            # 🌟 抓取縮圖與組裝連結
+            title = song.get('title', 'Unknown')
+            
+            # 確保歌手名稱正確提取
+            artists = song.get('artists', [])
+            if isinstance(artists, list):
+                artist_name = ", ".join([a.get('name', '') for a in artists if isinstance(a, dict)])
+            else:
+                artist_name = "Unknown"
+                
             thumbnails = song.get('thumbnails', [])
             image_url = thumbnails[-1]['url'] if thumbnails else "https://placehold.co/150x150/FF0000/white?text=YT"
             
@@ -135,8 +158,8 @@ def scrape_youtube():
             print(f"YouTube 第 {count} 名 | {title} - {artist_name}")
             
     except Exception as e:
-        print(f"❌ 爬蟲最終修正版發生錯誤: {e}")
-        return get_demo_youtube_data() 
+        print(f"❌ YouTube 爬蟲發生錯誤: {e}")
+        return [] 
         
     return records
 
