@@ -79,6 +79,7 @@ def index():
     yt_score = get_platform_score('YouTube')
     spotify_score = get_platform_score('Spotify')
 
+    
     # --- 內部輔助函數：資料清洗 (Data Cleaning) ---
     def clean_text(text):
         """去除歌名中的連字號或括號，提取核心名稱進行比對"""

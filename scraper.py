@@ -1,5 +1,6 @@
 import os
 import time
+import re
 import requests
 import psycopg2
 from bs4 import BeautifulSoup
@@ -18,6 +19,14 @@ from ytmusicapi import YTMusic
 # 載入環境變數
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
+
+#資料清洗-以免同歌被誤判成不同首
+def clean_song_title(raw_title):
+    # 去除小括號及內容，如 "(Official MV)"
+    title = re.sub(r'\s*\(.*?\)', '', raw_title)
+    # 去除中括號及內容，如 "[Official Video]"
+    title = re.sub(r'\s*\[.*?\]', '', title)
+    return title.strip()
 
 # ==========================================
 # 1. 資料庫寫入模組
@@ -86,7 +95,7 @@ def scrape_kkbox(driver):
     
     for row in rows:
         try:
-            song = row.find_element(By.CSS_SELECTOR, ".charts-list-song").text.strip()
+            song = clean_song_title(row.find_element(By.CSS_SELECTOR, ".charts-list-song").text.strip())
             artist = row.find_element(By.CSS_SELECTOR, ".charts-list-artist").text.strip()
             
             # 抓取圖片，若失敗則使用預設佔位圖
@@ -182,7 +191,7 @@ def scrape_youtube():
         for song in top_songs:
             if count >= 10: break
             
-            title = song.get('title', 'Unknown')
+            title = clean_song_title(song.get('title', 'Unknown'))
             
             # 確保歌手名稱能正確從列表中提取並格式化
             artists = song.get('artists', [])
@@ -274,7 +283,7 @@ def scrape_spotify():
                 if " - " in full_text:
                     parts = full_text.split(" - ", 1)
                     artist_name = parts[0].strip()
-                    title = parts[1].strip()
+                    title = clean_song_title(parts[1].strip())
                     
                     # 🌟 呼叫輔助函數抓取高畫質封面圖
                     image_url = fetch_album_art(title, artist_name)
