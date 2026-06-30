@@ -1,7 +1,10 @@
 import os
+import subprocess # 用於在背景執行爬蟲腳本
 import psycopg2
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify # 加入 request, jsonify
 from dotenv import load_dotenv
+import subprocess
+import os
 
 # 載入環境變數
 load_dotenv()
@@ -13,9 +16,6 @@ app = Flask(__name__)
 def get_charts_data():
     """
     從資料庫取得當日的跨平台音樂排行榜資料。
-    
-    Returns:
-        list: 包含每首歌曲排行榜資訊的字典列表。
     """
     conn = None
     cur = None
@@ -51,10 +51,8 @@ def get_charts_data():
         print(f"資料庫讀取錯誤: {e}")
     finally:
         # 確保資料庫連線安全關閉
-        if cur: 
-            cur.close()
-        if conn: 
-            conn.close()
+        if cur: cur.close()
+        if conn: conn.close()
             
     return songs
 
@@ -79,47 +77,42 @@ def index():
     yt_score = get_platform_score('YouTube')
     spotify_score = get_platform_score('Spotify')
 
-    
     # --- 內部輔助函數：資料清洗 (Data Cleaning) ---
     def clean_text(text):
-        """去除歌名中的連字號或括號，提取核心名稱進行比對"""
-        text = text.split('-')[0].split('(')[0].split('（')[0]
+        """去除歌名中的括號與分隔符號，提取核心名稱進行比對"""
+        text = text.split('(')[0].split('（')[0].split('[')[0].split('【')[0]
+        if " - " in text:
+            text = text.split(" - ")[0]
         return text.strip().lower()
 
     # 2. 跨平台權重演算法與資料去重
     song_stats = {}
     for s in chart_songs:
-        # 使用清洗後的核心歌名作為唯一識別碼 (Unique Key)
         core_song_name = clean_text(s['song_name'])
         unique_key = core_song_name
 
-        # 計算該首歌曲在目前平台獲得的權重分數
         try:
             points = 11 - int(s['rank'])
         except:
             points = 0
 
-        # 若該歌曲尚未存在於統計字典中，則初始化其資料結構
         if unique_key not in song_stats:
             song_stats[unique_key] = {
-                "song_name": s['song_name'],      # 保留第一次抓到的完整歌名以供顯示
-                "artist_name": s['artist_name'],  # 保留歌手名稱
+                "song_name": s['song_name'],
+                "artist_name": s['artist_name'],
                 "image_url": s['image_url'],
                 "song_url": s['song_url'],
-                "total_score": 0,                 # 初始化總分
-                "platforms": []                   # 紀錄上榜的平台
+                "total_score": 0,
+                "platforms": []
             }
         
-        # 將分數累加，並紀錄來源平台
         song_stats[unique_key]["total_score"] += points
         if s['platform'] not in song_stats[unique_key]["platforms"]:
             song_stats[unique_key]["platforms"].append(s['platform'])
 
     # 3. 排序並篩選出全網綜合影響力 Top 5
-    # 根據 total_score 由大到小排序
     top_integrated_songs = sorted(song_stats.values(), key=lambda x: x['total_score'], reverse=True)[:5]
     
-    # 4. 渲染前端網頁
     return render_template(
         "index.html", 
         songs=chart_songs,
@@ -129,5 +122,32 @@ def index():
         top_integrated_songs=top_integrated_songs
     )
 
+# --- 新增的爬蟲觸發路由 ---
+# 修改 trigger_scraper 函式中的密碼檢查邏輯
+@app.route('/api/run-scraper')
+def trigger_scraper():
+    # 從環境變數讀取密碼
+    secret_key = request.args.get('key')
+    required_key = os.getenv("SCRAPER_SECRET")
+    
+    # 加入防呆檢查：如果環境變數沒設，回傳錯誤
+    if not required_key:
+        return jsonify({"status": "error", "message": "Server configuration error"}), 500
+
+    if secret_key != required_key:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        
+    try:
+        # 修改這一行，將 output 和 error 都導向 DEVNULL，不要讓日誌影響到請求
+        subprocess.Popen(
+            ["python", "scraper.py"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return jsonify({"status": "success", "message": "Scraper started"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # 在 Render 上部署時，確保 debug 為 False
+    app.run(debug=False)

@@ -166,10 +166,15 @@ def scrape_youtube():
         search_results = yt.search("台灣百大熱門歌曲", filter="playlists")
         target_playlist_id = None
         
-        # 過濾尋找 YouTube Music 官方建立，或標題明確標示台灣的歌單
+       # 過濾尋找 YouTube Music 官方建立，或標題明確標示台灣的歌單
         for playlist in search_results:
-            author = playlist.get('author', '')
-            title = playlist.get('title', '')
+            # 🌟 修復點：安全地取得資料，並強制轉為字串，避免 NoneType 錯誤
+            raw_author = playlist.get('author')
+            raw_title = playlist.get('title')
+            
+            author = str(raw_author) if raw_author else ""
+            title = str(raw_title) if raw_title else ""
+            
             if 'YouTube' in author or '台灣' in title or 'Taiwan' in title:
                 target_playlist_id = playlist.get('browseId')
                 print(f"👉 成功鎖定目標歌單：{title} ({target_playlist_id})")
